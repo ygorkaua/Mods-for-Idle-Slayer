@@ -1,0 +1,9 @@
+bin/
+obj/
+bin_release/
+out/
+*.user
+*.suo
+.vs/
+.vscode/
+.idea/

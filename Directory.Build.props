@@ -1,0 +1,13 @@
+<Project>
+  <!--
+    Where the game's MelonLoader and Idle Slayer Mods Core assemblies are.
+    Default: the Idle Slayer Mod Manager folder on Windows (%LOCALAPPDATA%\IdleSlayerModManager).
+    Override with an environment variable or on the command line, e.g.
+      dotnet build -p:ModManagerRoot="D:\IdleSlayerModManager"
+      export ModManagerRoot=/mnt/c/Users/<you>/AppData/Local/IdleSlayerModManager   (WSL)
+  -->
+  <PropertyGroup>
+    <ModManagerRoot Condition="'$(ModManagerRoot)' == ''">$(LOCALAPPDATA)\IdleSlayerModManager</ModManagerRoot>
+    <ML>$(ModManagerRoot)/ModLoader/MelonLoader</ML>
+  </PropertyGroup>
+</Project>
