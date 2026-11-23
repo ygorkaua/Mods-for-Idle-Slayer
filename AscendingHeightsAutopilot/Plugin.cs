@@ -3,7 +3,7 @@ using IdleSlayerMods.Common.Config;
 using MelonLoader;
 using UnityEngine;
 
-[assembly: MelonInfo(typeof(AutoAscendingHeights.Plugin), "Ascending Heights Autopilot", "1.0.0", "ygorkaua")]
+[assembly: MelonInfo(typeof(AutoAscendingHeights.Plugin), "Ascending Heights Autopilot", "1.0.1", "ygorkaua")]
 [assembly: MelonAdditionalDependencies("IdleSlayerMods.Common")]
 
 namespace AutoAscendingHeights;

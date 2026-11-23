@@ -18,9 +18,24 @@ public class AutoClimber : MonoBehaviour
     private int _jumps;
     private bool _finishing;
     private bool _errorLogged;
+    private float _maxY, _lastY, _slowestFrame;
+
+    // Checked on every physics step: if the frame rate drops (window in the background, lag spike),
+    // several physics steps run between two Update calls and the player could fall the 50 units
+    // that lose the run before Update reacts.
+    private void FixedUpdate()
+    {
+        try { Tick(); }
+        catch (Exception e)
+        {
+            if (!_errorLogged) { _errorLogged = true; Plugin.Logger.Error($"Auto climb failed: {e}"); }
+        }
+    }
 
     private void Update()
     {
+        if (_wasPlaying) _slowestFrame = Mathf.Max(_slowestFrame, Time.unscaledDeltaTime);
+
         if (Input.GetKeyDown(Plugin.Settings.ToggleKey.Value))
         {
             Plugin.Settings.Enabled.Value = !Plugin.Settings.Enabled.Value;
@@ -56,11 +71,16 @@ public class AutoClimber : MonoBehaviour
                 _finishTrigger = null;
                 _arrivedAt = -1f;
                 _teleportLogged = false;
+                _maxY = float.MinValue;
+                _slowestFrame = 0f;
                 Plugin.Logger.Msg($"Ascending Heights started (auto climb {(Plugin.Settings.Enabled.Value ? "on" : "off")})");
             }
             else
             {
                 Plugin.Logger.Msg($"Ascending Heights ended (auto jumps: {_jumps})");
+                if (!_finishing && Plugin.Settings.Enabled.Value)
+                    Plugin.Logger.Warning($"Run ended before reaching the finish: last player y={_lastY:0.0}, highest y={_maxY:0.0}, " +
+                                          $"slowest frame {_slowestFrame * 1000f:0} ms, time scale {Time.timeScale:0.##}.");
                 _bridge = null;
                 _finishLine = null;
                 _finishTrigger = null;
@@ -71,6 +91,8 @@ public class AutoClimber : MonoBehaviour
 
         var player = PlayerMovement.instance;
         if (player == null || player.rigidBody == null) return;
+        _lastY = player.transform.position.y;
+        _maxY = Mathf.Max(_maxY, _lastY);
 
         // Once the player got above the finish bridge, stay in "finishing" mode for the rest of the run:
         // after landing, the player's position is level with the bridge (not above it), so re-checking
